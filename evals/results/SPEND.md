@@ -30,6 +30,7 @@ runs, so each billed amount belongs to that one command.
 | 7 | 2026-11-10T00:08:01Z | `20261110T000801Z-task-16f-hybrid-on-v2-with-a3-message-we` | 0.4928 | 0.4668 | 4.419306 → 4.886077 | **0.4668** | **4.8861** | 45.1139 |
 | 8 | 2026-11-10T19:35:19Z | `20261110T193519Z-final-test-run-haiku-legacy-rules-full-h` | 4.0110 | 4.1160 | 4.886077 → 9.002066 | **4.1160** | **9.0021** | 40.9979 |
 | 9 | 2026-11-11T03:09:27Z | `20261111T030927Z-decontamination-rerun-prompt-example-nam` | 1.3370 | 1.2619 | 9.002066 → 10.263950 | **1.2619** | **10.2640** | 39.7360 |
+| 10 | 2026-11-11T03:26:30Z | live run on Siddharth's own Gmail (no run folder) | – | 0.1656 | 10.263950 → 10.429527 | **0.1656** | **10.4295** | 39.5705 |
 
 ## Commands
 
@@ -122,3 +123,15 @@ runs, so each billed amount belongs to that one command.
    ```
    python -m evals.run routing --modes legacy_rules,full,hybrid --sizes 10,30,100,300 --split test --runs 3 --embedder fastembed --cases amb-person-001,amb-person-002,amb-person-003,amb-person-004,amb-person-005,clear-person-001,clear-person-002,multi-intent-002,multi-person-001,multi-person-003,trigger-002 --max-cost 2 --purpose "Decontamination rerun: prompt example names replaced, 11 test cases sharing names, legacy_rules+full+hybrid x 4 sizes x 3 runs (Haiku)" --yes
    ```
+
+10. Live run of the product on Siddharth's own Gmail (local server and web app, about 8 minutes; all agents on Haiku 5.5
+    via `OPENPOKE_MODEL`; 40 LLM calls). No estimate: this was interactive use, not an eval command. The "runner actual"
+    is the sum of OpenRouter's per-call `usage.cost`, from the opt-in per-call log `OPENPOKE_COST_LOG=data/costs.jsonl`.
+    By caller: email search 0.1380 (4 calls, 270,561 prompt tokens), interaction agent 0.0182 (23 calls), execution
+    agents 0.0087 (9 calls), batch manager 0.0006 (4 calls). The "before" read was taken at 2026-11-11T03:26:30Z and
+    gave 10.2639499, equal to row 9's "after" figure. Reads at 03:28:59Z (10.2664739) and 03:34:53Z (10.3400684) were
+    still settling; the read at 03:36:55Z gave 10.4295267. Billed 0.1655768 matches the per-call log's 0.1656.
+
+    ```
+    python -m server.server --reload    # with npm run dev --prefix web; Gmail connected through Composio
+    ```

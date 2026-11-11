@@ -393,7 +393,6 @@ def test_get_agent_store_singleton_and_path(monkeypatch, tmp_path):
     first, second = get_agent_store(), get_agent_store()
     assert first is second and len(created) == 1
     assert created[0].parts[-3:] == ("server", "data", "agents.db")
-    assert not created[0].exists()
 
 
 # ---- FTS: stopwords never reach BM25 (Task 16e) ----

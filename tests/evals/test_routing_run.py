@@ -215,8 +215,7 @@ def test_api_key_never_written(tmp_path):
 
 
 def test_model_override_reaches_llm_kwargs(tmp_path, monkeypatch):
-    from server.config import get_settings
-    assert get_settings().interaction_agent_model != HAIKU
+    # Both overrides are checked, so at least one differs from the configured model (OPENPOKE_MODEL may set it).
     _, llm = execute(tmp_path, config(model=HAIKU))
     assert {r["model"] for r in llm.requests} == {HAIKU}
     _, llm = execute(tmp_path, config(model=SONNET))

@@ -217,7 +217,10 @@ def initiate_connect(payload: GmailConnectPayload, settings: Settings) -> JSONRe
     _clear_cached_profile(user_id)
     try:
         client = _get_composio_client(settings)
-        req = client.connected_accounts.initiate(user_id=user_id, auth_config_id=auth_config_id)
+        accounts = client.connected_accounts
+        # Composio retired `initiate` for Composio-managed OAuth configs; `link` returns the same ConnectionRequest
+        start = accounts.link if hasattr(accounts, "link") else accounts.initiate
+        req = start(user_id=user_id, auth_config_id=auth_config_id)
         data = {
             "ok": True,
             "redirect_url": getattr(req, "redirect_url", None) or getattr(req, "redirectUrl", None),

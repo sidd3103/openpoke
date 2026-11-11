@@ -57,12 +57,12 @@ class Settings(BaseModel):
     server_host: str = Field(default=os.getenv("OPENPOKE_HOST", "0.0.0.0"))
     server_port: int = Field(default=_env_int("OPENPOKE_PORT", 8001))
 
-    # LLM model selection
-    interaction_agent_model: str = Field(default="anthropic/claude-sonnet-5.5")
-    execution_agent_model: str = Field(default="anthropic/claude-sonnet-5.5")
-    execution_agent_search_model: str = Field(default="anthropic/claude-sonnet-5.5")
-    summarizer_model: str = Field(default="anthropic/claude-sonnet-5.5")
-    email_classifier_model: str = Field(default="anthropic/claude-sonnet-5.5")
+    # LLM model selection; OPENPOKE_MODEL overrides all five (e.g. a cheaper model for local use)
+    interaction_agent_model: str = Field(default=os.getenv("OPENPOKE_MODEL", "anthropic/claude-sonnet-5.5"))
+    execution_agent_model: str = Field(default=os.getenv("OPENPOKE_MODEL", "anthropic/claude-sonnet-5.5"))
+    execution_agent_search_model: str = Field(default=os.getenv("OPENPOKE_MODEL", "anthropic/claude-sonnet-5.5"))
+    summarizer_model: str = Field(default=os.getenv("OPENPOKE_MODEL", "anthropic/claude-sonnet-5.5"))
+    email_classifier_model: str = Field(default=os.getenv("OPENPOKE_MODEL", "anthropic/claude-sonnet-5.5"))
     description_model: str = Field(default="anthropic/claude-haiku-5.5")
     eval_dev_model: str = Field(default="anthropic/claude-haiku-5.5")
 

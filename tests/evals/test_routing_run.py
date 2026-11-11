@@ -315,7 +315,9 @@ def test_cap_reserves_the_estimate_with_a_safety_margin():
     assert ledger.try_reserve(0.6) and not ledger.try_reserve(0.6)
 
 
-def test_report_has_expected_sections_and_experiments_gets_one_line(tmp_path):
+def test_report_has_expected_sections_and_experiments_gets_one_line(tmp_path, monkeypatch):
+    # pin the git note so the test doesn't depend on whether the checkout has uncommitted changes
+    monkeypatch.setattr(rr, "git_note", lambda: "uncommitted working tree on HEAD abc1234")
     run_dir, _ = execute(tmp_path)
     report = (run_dir / "report.md").read_text()
     for heading in ["# Routing run", "## Setup", "## Cost", "## Pass rate by mode × N", "## Pass rate by category",

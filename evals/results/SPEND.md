@@ -126,11 +126,11 @@ runs, so each billed amount belongs to that one command.
 
 10. Live run of the product on Siddharth's own Gmail (local server and web app, about 8 minutes; all agents on Haiku 5.5
     via `OPENPOKE_MODEL`; 40 LLM calls). No estimate: this was interactive use, not an eval command. The "runner actual"
-    is the sum of OpenRouter's per-call `usage.cost`, from the opt-in per-call log `OPENPOKE_COST_LOG=data/costs.jsonl`.
+    is the sum of OpenRouter's per-call `usage.cost`, recorded by a local cost-logging patch that is not part of this branch.
     By caller: email search 0.1380 (4 calls, 270,561 prompt tokens), interaction agent 0.0182 (23 calls), execution
     agents 0.0087 (9 calls), batch manager 0.0006 (4 calls). The "before" read was taken at 2026-11-11T03:26:30Z and
     gave 10.2639499, equal to row 9's "after" figure. Reads at 03:28:59Z (10.2664739) and 03:34:53Z (10.3400684) were
-    still settling; the read at 03:36:55Z gave 10.4295267. Billed 0.1655768 matches the per-call log's 0.1656.
+    still settling; the read at 03:36:55Z gave 10.4295267. Billed 0.1655768 matches the logged per-call sum of 0.1656.
 
     ```
     python -m server.server --reload    # with npm run dev --prefix web; Gmail connected through Composio

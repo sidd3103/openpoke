@@ -44,3 +44,14 @@ server/venv/
 # Generated documentation / analysis artifacts
 server/repomix-output.txt
 server/plans/
+
+docs/
+# Inspect AI logs regenerate from run folders (python -m evals.run inspect)
+evals/inspect_logs/
+# Eval run folders are kept locally, not in the repo
+evals/results/*/
+# Working notes kept locally
+evals/FUTURE_WORK.md
+evals/TIMELINE.md
+evals/results/changes.md
+evals/cases/v2-REVIEW.md

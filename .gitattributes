@@ -1,0 +1,4 @@
+# Generated eval data: collapsed in GitHub diffs and excluded from language stats
+evals/world/*.json linguist-generated=true
+evals/world/stress/*.json linguist-generated=true
+evals/cases/**/*.json linguist-generated=true

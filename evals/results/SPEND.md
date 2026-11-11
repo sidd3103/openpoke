@@ -29,6 +29,7 @@ runs, so each billed amount belongs to that one command.
 | 6 | 2026-11-09T21:45:57Z | `20261109T214557Z-task-16-v2-baseline-agent-backed-history` | 1.4519 | 1.5420 | 2.877339 → 4.419306 | **1.5420** | **4.4193** | 45.5807 |
 | 7 | 2026-11-10T00:08:01Z | `20261110T000801Z-task-16f-hybrid-on-v2-with-a3-message-we` | 0.4928 | 0.4668 | 4.419306 → 4.886077 | **0.4668** | **4.8861** | 45.1139 |
 | 8 | 2026-11-10T19:35:19Z | `20261110T193519Z-final-test-run-haiku-legacy-rules-full-h` | 4.0110 | 4.1160 | 4.886077 → 9.002066 | **4.1160** | **9.0021** | 40.9979 |
+| 9 | 2026-11-11T03:09:27Z | `20261111T030927Z-decontamination-rerun-prompt-example-nam` | 1.3370 | 1.2619 | 9.002066 → 10.263950 | **1.2619** | **10.2640** | 39.7360 |
 
 ## Commands
 
@@ -108,4 +109,16 @@ runs, so each billed amount belongs to that one command.
 
    ```
    python -m evals.run routing --modes legacy_rules,full,hybrid --sizes 10,30,100,300 --split test --runs 3 --embedder fastembed --max-cost 6 --purpose "Final test run: Haiku, legacy_rules+full+hybrid x N=10,30,100,300 x 3 runs, frozen 39a1439" --yes
+   ```
+
+9. Decontamination rerun (Haiku 5.5, test split, case set v2; `legacy_rules`/`full`/`hybrid` × N = 10, 30, 100, 300 ×
+   3 runs on the 11 test cases that shared names or topics with the prompt's examples; 396 case-runs, 0 infra
+   errors). The prompt's example names and topics (Alice Chen/Park, Sam Rivera, Imani, Helena Rossi, Theo, "offsite",
+   "deadline extension") were replaced with ones that appear nowhere in the eval world or cases. Siddharth approved
+   it after the proposal estimate of 1.34. The "before" read was taken at 2026-11-11T03:09:21Z and gave 9.0020655,
+   equal to row 8's "after" figure. A read at 03:17:25Z gave 10.2458164, still settling; the read at 03:17:49Z gave
+   10.2639499. Billed 1.2618844 matches the runner's 1.2619, 5.6% under the estimate.
+
+   ```
+   python -m evals.run routing --modes legacy_rules,full,hybrid --sizes 10,30,100,300 --split test --runs 3 --embedder fastembed --cases amb-person-001,amb-person-002,amb-person-003,amb-person-004,amb-person-005,clear-person-001,clear-person-002,multi-intent-002,multi-person-001,multi-person-003,trigger-002 --max-cost 2 --purpose "Decontamination rerun: prompt example names replaced, 11 test cases sharing names, legacy_rules+full+hybrid x 4 sizes x 3 runs (Haiku)" --yes
    ```

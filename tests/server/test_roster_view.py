@@ -21,8 +21,8 @@ LEGACY_TOOL_SCHEMAS_SHA256 = "3d957311ef46de6c7f5f2fc8eb173c4c213e7d45330c5ddf90
 LEGACY_TOOL_SCHEMAS_ORDERED_SHA256 = "f4d7dd0edb758224dc49f605aa98fc6cf055e02c1dcad6b496bdd0875afa5e58"
 # Names composition (system_prompt.md + prompt_tools_names.md) as pinned at Task F5 (was dbb79c8:
 # a0ced981... stripped, fd36a3b1... raw): sha256 after .strip() (P2-R10) and with a trailing newline.
-NAMES_PROMPT_STRIPPED_SHA256 = "e92328a1179e65d82c119d8f7d37a8eabd48359aaa91c4454cbebbc2d429694e"
-NAMES_PROMPT_RAW_SHA256 = "79d19f1f1f4b1b01cec5b19ab8228b9246652262acb5ba077f385c6ee962bae8"
+NAMES_PROMPT_STRIPPED_SHA256 = "d6ba3599ebb28705cb54f3be72e5ae15aafc506bc73290b352a94334b81e21fb"  # 2026-11-11: example names/topics replaced with ones not in the eval world (decontamination)
+NAMES_PROMPT_RAW_SHA256 = "c19a1f2f197911d59159e49c47640c316b705d02e5890e460ab97a41ef9859e8"  # 2026-11-11: example names/topics replaced with ones not in the eval world (decontamination)
 LEGACY_PROMPT_SHA256 = "d8257b89da9fcb47eaf980b1f9a097c8e147c45196e569e13303c04ec9a1da37"
 OLD_REUSE_LINE = "Don't worry if the agent name is unrelated"
 
@@ -177,7 +177,7 @@ def test_ids_block_states_the_plan_rules():
 
 # The ids block after Task F3 (deliberate prompt change): the three earlier lines, the reworded "never write an
 # email yourself" line and the pronoun line (F2 pinned 54a87503...; R-F1-5 pinned the three-line block at 0e55f9ab...).
-IDS_BLOCK_SHA256 = "9f1bfa15579ebc4b0f7e5cd310fa78fef887e58fb671bea5cdced9ea537203ad"
+IDS_BLOCK_SHA256 = "4956572c8564066f8065c610d7f16daf81b2b26c11881b4dead33e4de820a8f2"  # 2026-11-11: example names/topics replaced with ones not in the eval world (decontamination)
 NEVER_WRITE_EMAIL_LINE = (
     "- Never write an email yourself. `send_draft` only shows the user a draft that an agent wrote. To reply to or follow up on an email an agent already handled, send the instructions to that agent's `agent_id`; it writes the reply in that thread. A new email on a new topic needs a new agent, even when an existing agent already emails the same person. Contact addresses on the agent cards are there to help you pick the right agent, not for emailing people directly.\n"
 )

@@ -16,7 +16,7 @@ T1 = datetime(2026, 11, 1, 12, 0, tzinfo=timezone.utc)
 CFG = RetrievalConfig()  # k=20, rrf_k=60, history_turns=2
 
 # sha256 of build_system_prompt("ids") at the start of Task 13-M: "full" must not change.
-IDS_PROMPT_SHA256 = "51607697cf61f214ca54c14a5f85398c12e86bcf809c1f3bf7c37e159534aa3c"
+IDS_PROMPT_SHA256 = "1db0ff860baa92edbfa2f687cfd6285158cf0cb4cc4ab58c8a0545598471c6d5"  # 2026-11-11: example names/topics replaced with ones not in the eval world (decontamination)
 
 
 def no_triggers(agent_id):

@@ -10,7 +10,9 @@ Every paid API call made on the company key, for reporting where the budget went
 **Method.** For every paid command the ledger records:
 
 - **Estimate:** the cost the command prints before it runs.
-- **Runner actual:** tokens from every response's `usage` block × the list price in `evals/pricing.py`.
+- **Runner actual:** tokens from every response's `usage` block × the list price in `evals/pricing.py`. From row 11
+  on, it is the sum of OpenRouter's per-response `usage.cost` (prompt caching makes token × list price wrong); token
+  pricing with cache rates is only the fallback when a response has no cost.
 - **Billed:** the key's OpenRouter `usage` after the command minus before it. This figure is authoritative.
 
 On the personal key, runner totals matched OpenRouter billing to within 0.01. OpenRouter's usage figure lags by
@@ -31,6 +33,10 @@ runs, so each billed amount belongs to that one command.
 | 8 | 2026-11-10T19:35:19Z | `20261110T193519Z-final-test-run-haiku-legacy-rules-full-h` | 4.0110 | 4.1160 | 4.886077 → 9.002066 | **4.1160** | **9.0021** | 40.9979 |
 | 9 | 2026-11-11T03:09:27Z | `20261111T030927Z-decontamination-rerun-prompt-example-nam` | 1.3370 | 1.2619 | 9.002066 → 10.263950 | **1.2619** | **10.2640** | 39.7360 |
 | 10 | 2026-11-11T03:26:30Z | live run on Siddharth's own Gmail (no run folder) | – | 0.1656 | 10.263950 → 10.429527 | **0.1656** | **10.4295** | 39.5705 |
+| 11 | 2026-11-11T21:52:34Z | `20261111T215234Z-sonnet-caching-smoke-check-cache-reads-w` | 0.1369 | 0.1490 | 10.429527 → 10.578510 | **0.1490** | **10.5785** | 39.4215 |
+| 12 | 2026-11-11T21:59:34Z | `20261111T215934Z-sonnet-caching-smoke-after-wait-ends-tur` | 0.1369 | 0.0854 | 10.578510 → 10.663939 | **0.0854** | **10.6639** | 39.3361 |
+| 13 | 2026-11-11T22:05:12Z | `20261111T220512Z-sonnet-5-5-test-run-legacy-rules-hybrid` | 18.0435 | 4.6276 | 10.663939 → 15.291509 | **4.6276** | **15.2915** | 34.7085 |
+| 14 | 2026-11-12T00:10:14Z | live session, local servers (no run folder) | – | – | 15.291509 → 15.294762 | **0.0033** | **15.2948** | 34.7052 |
 
 ## Commands
 
@@ -131,6 +137,56 @@ runs, so each billed amount belongs to that one command.
     agents 0.0087 (9 calls), batch manager 0.0006 (4 calls). The "before" read was taken at 2026-11-11T03:26:30Z and
     gave 10.2639499, equal to row 9's "after" figure. Reads at 03:28:59Z (10.2664739) and 03:34:53Z (10.3400684) were
     still settling; the read at 03:36:55Z gave 10.4295267. Billed 0.1655768 matches the logged per-call sum of 0.1656.
+
+    ```
+    python -m server.server --reload    # with npm run dev --prefix web; Gmail connected through Composio
+    ```
+
+11. Sonnet caching smoke (Sonnet 5.5, test split, case set v2; `hybrid` × N = 10 × 1 run on 3 cases: clear-person-001,
+    broad-person-002, multi-intent-001; 5 attempts, 2 of them retries after the first attempt hit the interaction
+    agent's 8-call limit). First run with prompt caching in the OpenRouter client (system prompt marked; tool loops
+    also cache the conversation) and with the runner charging OpenRouter's `usage.cost`. The estimate is the uncached
+    figure. 268,010 of 299,067 prompt tokens were cache reads and 30,977 were cache writes; all 5 attempts were charged
+    from `usage.cost`. At list price without caching these tokens would have cost about 0.64. The "before" read was
+    taken at 2026-11-11T21:52:29Z and gave 10.4295267, equal to row 10's "after" figure. A read at 21:53:21Z gave
+    10.5328964, still settling; reads at 21:53:28Z and 21:53:32Z both gave 10.5785102. Billed 0.1489835 matches the
+    runner's 0.148984.
+
+    ```
+    python -m evals.run routing --model anthropic/claude-sonnet-5.5 --modes hybrid --sizes 10 --split test --runs 1 --embedder fastembed --cases clear-person-001,broad-person-002,multi-intent-001 --max-cost 0.5 --purpose "Sonnet caching smoke: check cache reads/writes and usage.cost through OpenRouter" --yes
+    ```
+
+12. Rerun of row 11 after the interaction agent's loop was changed to end the turn on a response whose only tool call
+    is `wait` (same command, cases, model and cap; new purpose). 3 attempts, no retries, 2 round trips per case-run
+    (row 11: 3, 8 and 8, two of them after a retry). 22,777 of 48,633 prompt tokens were cache reads and 25,838 were
+    cache writes; all 3 attempts were charged from `usage.cost`. The "before" read was taken at 2026-11-11T21:59:33Z
+    and gave 10.5785102, equal to row 11's "after" figure. Reads at 21:59:46Z and 21:59:54Z gave 10.5785102, not yet
+    updated; two further reads at 21:59:54Z gave 10.6639389. Billed 0.0854287 matches the runner's 0.085429.
+
+    ```
+    python -m evals.run routing --model anthropic/claude-sonnet-5.5 --modes hybrid --sizes 10 --split test --runs 1 --embedder fastembed --cases clear-person-001,broad-person-002,multi-intent-001 --max-cost 0.5 --purpose "Sonnet caching smoke after wait-ends-turn fix" --yes
+    ```
+
+13. Sonnet 5.5 test run (test split, case set v2; `legacy_rules` and `hybrid` × N = 10, 300 × 3 runs on all 33 test
+    cases; 396 case-runs, 0 infra errors, 0 retries, 0 iteration-limit hits, 2.08 round trips per case-run). Run on an
+    uncommitted working tree (prompt caching, `usage.cost` costing and the `wait`-ends-turn fix, rows 11–12); the run
+    folder's git note records this. Siddharth approved it with the cap at 12. The estimate is the uncached figure;
+    6,553,290 of 7,330,695 prompt tokens (89%) were cache reads and 774,963 were cache writes; all 396 attempts were
+    charged from `usage.cost`. The "before" read was taken at 2026-11-11T22:05:06Z and gave 10.6639389, equal to row
+    12's "after" figure. Reads from 22:13:46Z to 22:14:46Z moved between 14.7699155 and 15.2146868 (one read went
+    back down, so OpenRouter's figure was still settling); reads at 22:14:53Z and after gave 15.2915094. Billed
+    4.6275705 matches the runner's 4.62757.
+
+    ```
+    python -m evals.run routing --model anthropic/claude-sonnet-5.5 --modes legacy_rules,hybrid --sizes 10,300 --split test --runs 3 --embedder fastembed --max-cost 12 --purpose "Sonnet 5.5 test run: legacy_rules+hybrid x N=10,300 x 3 runs, prompt caching + wait-ends-turn fix (uncommitted)" --yes
+    ```
+
+14. Live session on the local server and web app (about 4 minutes; all agents on Haiku 5.5 via `OPENPOKE_MODEL`;
+    Gmail connected, so the important-email watcher polled every 60 s). One chat message: the interaction agent created
+    one agent ("Check user's latest email"), which completed successfully. No estimate and no runner figure: this was
+    interactive use, and no per-call cost log ran. The "before" read was taken at 2026-11-12T00:10:14Z and gave
+    15.2915094, equal to row 13's "after" figure. Reads at 00:14:41Z gave 15.2915094, not yet updated; reads at
+    00:14:49Z, 00:15:10Z, 00:15:31Z and 00:16:56Z all gave 15.294761915. Billed 0.0032525.
 
     ```
     python -m server.server --reload    # with npm run dev --prefix web; Gmail connected through Composio
